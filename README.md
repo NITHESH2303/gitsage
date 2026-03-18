@@ -22,6 +22,14 @@ it delegates to gitsage → Ollama locally. No cloud AI touches your diffs.
 | `git_branch_name` | Generate a branch name from a task description |
 | `git_status` | Return `git status` for a repo path |
 | `git_staged_diff` | Return `git diff --staged` for a repo path |
+| `git_add` | Stage files (`git add`); defaults to staging everything |
+| `git_fetch` | Fetch from a remote (`git fetch origin`) |
+| `git_branch_create` | Create/checkout a branch; auto-fetches from remote if not found locally |
+| `git_commit` | Commit staged changes with a given message |
+| `git_push` | Push branch to remote; auto `--set-upstream` on first push |
+| `git_pull` | Pull latest changes from a remote |
+| `git_log` | Show commit history (configurable count and format) |
+| `git_stash` | Save, pop, or list stashed changes |
 
 ### Claude Desktop
 
@@ -57,6 +65,37 @@ Add to your Cursor MCP config (`.cursor/mcp.json` in your project, or global set
 
 The server speaks JSON-RPC 2.0 over stdio — compatible with any MCP client.
 Run it directly: `gitsage-mcp` (reads from stdin, writes to stdout).
+
+### Typical MCP workflow
+
+Full git workflow via MCP tools, in order:
+
+```
+1. git_status         → see what changed
+2. git_staged_diff    → review the diff
+3. git_add            → stage files (paths=["src/foo.py"] or omit for everything)
+4. git_commit_message → AI-generate a Conventional Commit message from the diff
+5. git_commit         → commit with that message
+6. git_push           → push to origin (auto --set-upstream on first push)
+```
+
+Branch workflow:
+
+```
+1. git_branch_name    → AI-generate a branch name from a task description
+2. git_branch_create  → create and checkout that branch
+3. ... make changes ...
+4. git_log            → review recent commits before opening a PR
+5. git_pr_description → AI-generate a PR description from the commit log
+```
+
+Stash workflow:
+
+```
+git_stash action=save   → stash current changes
+git_stash action=list   → see all stashes
+git_stash action=pop    → restore latest stash
+```
 
 ---
 
